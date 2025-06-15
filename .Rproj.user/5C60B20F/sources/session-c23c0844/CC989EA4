@@ -1,0 +1,26 @@
+{
+    "id": "CC989EA4",
+    "path": "/g/scb/zeller/pekel/crc-meta-ii/src/utils.R",
+    "project_path": "src/utils.R",
+    "type": "r_source",
+    "hash": "3992247895",
+    "contents": "",
+    "dirty": false,
+    "created": 1750023827829.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "560,0",
+        "scrollLine": "199"
+    },
+    "folds": "41|109|91|0|\n95|124|127|0|\n130|55|148|0|\n153|150|189|0|\n191|52|196|0|\n199|64|317|0|\n321|114|449|0|\n454|92|558|0|\n562|102|624|0|\n",
+    "lastKnownWriteTime": 1750023936,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1750023936499,
+    "read_only": false,
+    "read_only_alternatives": []
+}

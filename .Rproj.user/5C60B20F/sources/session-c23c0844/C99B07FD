@@ -1,0 +1,26 @@
+{
+    "id": "C99B07FD",
+    "path": "/g/scb/zeller/pekel/crc-meta-ii/models/Train.16s.wgs.rf.models.R",
+    "project_path": "models/Train.16s.wgs.rf.models.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1750023946622.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "13,13",
+        "scrollLine": "7"
+    },
+    "folds": "79|106|209|0|\n",
+    "lastKnownWriteTime": 1750024656,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1750024656,
+    "read_only": false,
+    "read_only_alternatives": []
+}
