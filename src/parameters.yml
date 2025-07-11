@@ -1,0 +1,98 @@
+#######
+# Meta-analysis reveals a universal microbiome signature for colorectal cancer irrespective of onset age and sequencing method
+# Pekel, Karcher et al.
+# Parameters file for visualization
+# by Selin Pekel
+#######
+
+plotting:
+  condition_colors:
+    CRC: '#C44600'
+    CTR: 'dodgerblue3'
+    AD: '#FEE391'
+    LO-CRC: 'darkred'
+    LO-CTR: 'dodgerblue3'
+    EO-CRC: 'darkorange'
+    EO-CTR: 'dodgerblue'
+    
+  assay_colors:
+    WGS: 'brown'
+    16S: 'cyan3'
+
+  brown_cohorts:
+    - BaxterNT_2016
+    - DengX_2018
+    - DuX_2022
+    - KonishiY_2022
+    - OkumuraS_2021
+    - TernesD_2022
+    - UchinoY_2021
+    - YangTW_2019
+    - YangY_2021a
+    - YangY_2021b
+    - YoungC1_2021
+    - YoungC2_2021
+    - ZhouZ_2022
+
+  cyan_cohorts:
+    - FengQ_2015
+    - GaoR_2021
+    - HanniganGD_2018
+    - LiuNN_2022
+    - ThomasAM_2019_1
+    - ThomasAM_2019_2
+    - VogtmannE_2016
+    - WirbelJ_2019
+    - XuJ_2022
+    - YachidaS_2019
+    - YangJ_2019
+    - YangY_2021c
+    - YuJ_2017
+    - ZellerG_2014
+
+  brown_palette:
+    - '#191306'
+    - '#32260d'
+    - '#4b3914'
+    - '#644c1b'
+    - '#7d5f22'
+    - '#967228'
+    - '#af852f'
+    - '#c89836'
+    - '#cfa54f'
+    - '#d6b268'
+    - '#dcbe81'
+    - '#e3cb9a'
+    - '#ead8b3'
+    - '#f1e5cc'
+
+  cyan_palette:
+    - '#061e1a'
+    - '#0c3c34'
+    - '#135a4e'
+    - '#197869'
+    - '#1f9683'
+    - '#26b49d'
+    - '#2cd2b7'
+    - '#4ad8c1'
+    - '#68dfcc'
+    - '#86e5d6'
+    - '#a4ebe0'
+    - '#c2f2ea'
+    - '#e0f8f4'
+    - '#ffffff'
+    
+
+  color_mapping_ad:
+    BaxterNT_2016: 'brown'
+    FengQ_2015: 'chocolate4'
+    GaoR_2021: 'cyan3'
+    HanniganGD_2018: 'cyan4'
+    KonishiY_2022: 'darkorange'
+    ThomasAM_2019_1: 'deepskyblue3'
+    XuJ_2022: 'darkgreen'
+    YachidaS_2019: 'purple3'
+    YangTW_2019: 'red3'
+    YoungC2_2021: 'gold3'
+    ZellerG_2014: 'magenta3'
+    ZhouZ_2022: 'blue4'
