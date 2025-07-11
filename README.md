@@ -116,11 +116,10 @@ crc-meta-ii
 -   To run LOSO models and evaluate both CRC and AD samples, use the scripts:
     -   `input.LOSO.rf.models.sh`
     -   `04.run.Train.LOSO.rf.models.sh`\
-        These scripts must be submitted via SLURM.
+    -  These scripts must be submitted via SLURM.
 -   To obtain study-to-study transfer (SST) evaluation AUCs, run:
     -   `05.Train.SCV.SST.rf.models.R`
--   Outputs from both LOSO and SST evaluations are stored in:\
-    `data/results/scv.loso/`
+-   Outputs from both LOSO and SST evaluations are stored in: `data/results/scv.loso/`
 
 ### 2. Statistical Analysis & Linear Mixed Models
 
@@ -132,8 +131,7 @@ crc-meta-ii
 ### 3. Model Evaluation & SHAP Analysis
 
 -   SHAP interpretation scripts are located in `src/analysis/` and are submitted via SLURM (`04*.sh`).
--   Median SHAP values are computed and saved under:\
-    `data/results/shap.analysis/`
+-   Median SHAP values are computed and saved under: `data/results/shap.analysis/`
 
 ### 4. Figure Generation
 
