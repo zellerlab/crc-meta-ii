@@ -2,8 +2,7 @@
 
 ## Meta-analysis reveals a universal microbiome signature for colorectal cancer irrespective of onset age and sequencing method
 
-**Selin Pekel\*, Nicolai Karcher\*, Morgan Essex, Stefano Romano, Quinten R. Ducarmon, Fabian Springer, Christian Schudoma, Martin Larralde, Alberto Lupatin, Sebastian Zeissig, Michael Zimmermann, Georg Zeller#**\
-(\*equal contribution, #correspondence: [georg.zeller\@gmail.com](mailto:georg.zeller@gmail.com){.email})
+**Selin Pekel\*, Nicolai Karcher\*, Morgan Essex, Stefano Romano, Quinten R. Ducarmon, Fabian Springer, Christian Schudoma, Martin Larralde, Alberto Lupatin, Sebastian Zeissig, Michael Zimmermann, Georg Zeller#**
 
 ------------------------------------------------------------------------
 
@@ -19,11 +18,7 @@ This repository contains the code, processed data, and figure scripts for the la
     \
     To ensure all required packages are installed, run the following command from the `crc-meta-ii/src/` directory:
 
-    <div>
-
-    Rscript requirements.R
-
-    </div>
+    `Rscript requirements.R`
 
 -   This project requires the SIAMCAT package, specifically version 2.7.2, as it includes important updates necessary for compatibility with the current workflow. Using an older version may lead to errors or unexpected behavior. To ensure proper functionality, please download the **SIAMCAT v2.7.2**
 
