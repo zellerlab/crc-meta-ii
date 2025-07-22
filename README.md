@@ -20,7 +20,7 @@ This repository contains the code, processed data, and figure scripts for the la
 
     `Rscript requirements.R`
 
--   This project requires the SIAMCAT package, specifically version 2.7.2, as it includes important updates necessary for compatibility with the current workflow. Using an older version may lead to errors or unexpected behavior. To ensure proper functionality, please download the **SIAMCAT v2.7.2**
+-   This project requires the **SIAMCAT** R package, specifically version **2.7.2**, which includes critical updates necessary for compatibility with the current workflow. Using an older version may result in errors or unexpected behavior. For detailed usage instructions and documentation, please visit the [SIAMCAT website](https://siamcat.embl.de/).
 
 -   In addition, SHAP value calculations in this project were performed using classifiers built with the **mlr3 package (version 0.20.2)**, so please ensure that this version is installed to avoid compatibility issues.
 
@@ -116,7 +116,7 @@ crc-meta-ii
 -   To run LOSO models and evaluate both CRC and AD samples, use the scripts:
     -   `input.LOSO.rf.models.sh`
     -   `04.run.Train.LOSO.rf.models.sh`\
-    -  These scripts must be submitted via SLURM.
+    -   These scripts must be submitted via SLURM.
 -   To obtain study-to-study transfer (SST) evaluation AUCs, run:
     -   `05.Train.SCV.SST.rf.models.R`
 -   Outputs from both LOSO and SST evaluations are stored in: `data/results/scv.loso/`
