@@ -2,7 +2,7 @@
 
 ## Meta-analysis reveals a universal microbiome signature for colorectal cancer irrespective of onset age and sequencing method
 
-**Selin Pekel\*, Nicolai Karcher\*, Morgan Essex, Stefano Romano, Quinten R. Ducarmon, Fabian Springer, Christian Schudoma, Martin Larralde, Alberto Lupatin, Sebastian Zeissig, Michael Zimmermann, Georg Zeller#**
+**Selin Pekel\*, Nicolai Karcher\*, Morgan Essex, Fabian Springer, Stefano Romano, Quinten R. Ducarmon, Christian Schudoma, Martin Larralde, Alberto Lupatin, Sebastian Zeissig, Michael Zimmermann, Georg Zeller#**
 
 ------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ This repository contains the code, processed data, and figure scripts for the la
 
 ## Requirements
 
--   This project requires **R version 4.4.1** or later.\
+-   This project requires **R version 4.3.3** or later.\
     \
     To ensure all required packages are installed, run the following command from the `crc-meta-ii/src/` directory:
 
@@ -31,15 +31,6 @@ This repository contains the code, processed data, and figure scripts for the la
 ``` text
 crc-meta-ii
 ├── data/
-│   ├── Metadata.all.samples.tsv
-│   ├── Metadata.all.samples.balanced.tsv
-│   ├── Relab.all.samples.tsv
-│   ├── Relab.all.samples.balanced.tsv
-│   ├── Raw.counts.all.samples.tsv
-│   ├── Raw.counts.wgs.motus.all.samples.tsv
-│   ├── mOTUs_taxonomy_table.tsv
-│   ├── fiber_data/
-│   ├── functional_data/
 │   └── results/
 │       ├── scv.loso/
 │       │   ├── ad.loso.test/
