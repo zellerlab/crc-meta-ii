@@ -907,9 +907,6 @@ plot_comparison_scatter <- function(data, x_col, y_col, x_label, y_label, featur
 }
 
 
-
-
-
 get_siamcat_loso_metrics <- function(siamcat_list) {
   
   # Initialize a data frame to store the results

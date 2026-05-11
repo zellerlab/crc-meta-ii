@@ -5,9 +5,90 @@
 source(here('src','utils.R'))
 params <- yaml::read_yaml(here("src", "parameters.yml"))
 plotting <- params$plotting
+condition_colors <- params$plotting$condition_colors
 
 ######################
-# Extended data figure 4a
+# Extended data figure 4a: Volcano plot comparing CRC vs CTR
+
+all.meta<- read_tsv(here('data','Metadata.all.samples.tsv')) %>% 
+  filter(Condition=='CRC' | Condition=='CTR') 
+
+all.data <- read.table(here('data','Relab.all.samples.tsv'),sep='\t',check.names = F)  %>%
+  rownames_to_column('genus') %>%
+  filter(genus!='unassigned') %>%
+  column_to_rownames('genus')
+
+all.data <- all.data[which(rowSums(all.data > 0) / ncol(all.data) > 0.1),]
+
+all.data <- all.data[,all.meta$Sample_ID]
+
+lmm.table.general.crc <- run_lmem(
+  data_df = all.data,
+  meta_df  = all.meta, column_name='Condition', ref_group='CTR', feature_column_name = 'Taxon')
+
+write.table(lmm.table.general.crc, file= here('data','results' ,'lmm.tables.ctr.crc.allsamples.tsv'), sep='\t', quote = F,row.names = F)
+
+
+volcano_crc_ctr <- plot_volcano(
+  plot_df = lmm.table.general.crc %>%
+    select(Taxon, P.val, P.adj, Effect.size, pr.shift, pr.CTR, pr.CRC, n.CRC, n.CTR),
+  group_case = 'CRC',
+  group_control = 'CTR',
+  feature_column_name = 'Taxon',
+  min_segment_length = 0.05, nudge_y = 0.05, max.overlaps = 5,
+  color_vector = c( condition_colors$CRC, condition_colors$CTR,  'n.s.' = 'white') # Custom colors
+) +
+  xlab('Effect size')+
+  theme(
+    legend.box = 'horizontal',
+    legend.spacing.y = unit(0.1, 'cm'),
+    legend.position = c(0, .99),
+    legend.key.size = unit(0.75, 'lines'),
+    legend.justification = c(0, 1)
+  )
+
+ggsave(volcano_crc_ctr,file= here('figures','extended.data.figure4','Extended.Data.Figure4a.pdf'), height = 5, width = 5)
+
+######################
+# Extended data figure 4b: Volcano plot comparing AD vs CRC
+
+meta.ad.crc <-  read_tsv(here('data','Metadata.all.samples.tsv')) %>% 
+  filter(Condition=='smallAD' | Condition=='AdvAD' | Condition=='AD'| Condition=='CRC') %>% 
+  mutate(Condition= gsub('AdvAD','AD',Condition)) %>% 
+  mutate(Condition= gsub('smallAD','AD',Condition))
+
+all.data.ad.crc <- all.data[,meta.ad.crc$Sample_ID]
+
+lmm.table.ad.vs.crc <- run_lmem(
+  data_df = all.data.ad.crc,
+  meta_df  = meta.ad.crc, column_name='Condition', ref_group='CRC', feature_column_name = 'Taxon')
+
+write.table(lmm.table.ad.vs.crc, file= here('data','results' ,'lmm.tables.ad.crc.tsv'), sep='\t', quote = F,row.names = F)
+lmm.table.ad.vs.crc<- read_tsv( here('data','results' ,'lmm.tables.ad.crc.tsv'))
+
+
+volcano_ad_crc <- plot_volcano(
+  plot_df = lmm.table.ad.vs.crc %>%
+    select(Taxon, P.val, P.adj, Effect.size, pr.shift, pr.AD, pr.CRC, n.CRC, n.AD),
+  group_case = 'CRC',
+  group_control = 'AD',
+  feature_column_name = 'Taxon',
+  min_segment_length = 0.05, nudge_y = 0.05, max.overlaps = 5,
+  color_vector = c( condition_colors$CRC, condition_colors$AD,  'n.s.' = 'white') # Custom colors
+) +
+  xlab('Effect size')+
+  theme(
+    legend.box = 'horizontal',
+    legend.spacing.y = unit(0.1, 'cm'),
+    legend.position = c(0, .99),
+    legend.key.size = unit(0.75, 'lines'),
+    legend.justification = c(0, 1)
+  )
+
+ggsave(volcano_ad_crc,file= here('figures','extended.data.figure4','Extended.Data.Figure4b.pdf'), height = 5, width = 5)
+
+######################
+# Extended data figure 4c: Volcano plot comparing AD vs CTR
 
 meta.ad <-  read_tsv(here('data','Metadata.all.samples.tsv')) %>% 
   filter(Condition=='smallAD' | Condition=='AdvAD' | Condition=='AD'| Condition=='CTR') %>% 
@@ -31,8 +112,6 @@ lmm.table.ad.vs.ctr <- run_lmem(
 
 write.table(lmm.table.ad.vs.ctr, file= here('data','results' ,'lmm.tables.ad.ctr.tsv'), sep='\t', quote = F,row.names = F)
 
-condition_colors <- params$plotting$condition_colors
-
 volcano_ad_ctr <- plot_volcano(
   plot_df = lmm.table.ad.vs.ctr %>%
     select(Taxon, P.val, P.adj, Effect.size, pr.shift, pr.AD, pr.CTR, n.CTR, n.AD),
@@ -42,7 +121,7 @@ volcano_ad_ctr <- plot_volcano(
   min_segment_length = 0.05, nudge_y = 0.05, max.overlaps = 5,
   color_vector = c(AD = condition_colors$AD, CTR = condition_colors$CTR, 'n.s.' = 'white') # Custom colors
 ) +
-  xlab('Adenoma enrichment effect size')+
+  xlab('Effect size')+
   theme(
     legend.box = 'horizontal',
     legend.spacing.y = unit(0.1, 'cm'),
@@ -51,336 +130,249 @@ volcano_ad_ctr <- plot_volcano(
     legend.justification = c(0, 1)
   )
 
-ggsave(volcano_ad_ctr,file= here('figures','extended.data.figure4','Extended.Data.Figure4a.pdf'), height = 5, width = 5)
+  ggsave(volcano_ad_ctr,file= here('figures','extended.data.figure4','Extended.Data.Figure4c.pdf'), height = 5, width = 5)
 
 ######################
-# Extended data figure 4b
+# Extended data figure 4d: Scatter plot comparing effect sizes in CRC vs CTR and AD vs CTR
 
-# Load all LOSO models from a single directory
-rdata_dir <- here('data','results','scv.loso','ad.loso.test')
+scatter.data <- lmm.table.general.crc %>% 
+  select(Taxon, Effect.size,P.adj) %>% 
+  left_join(lmm.table.ad.vs.ctr %>%select(Taxon, Effect.size,P.adj), by='Taxon' ,suffix = c('.CRC','.AD')) 
 
-flist <- list.files(rdata_dir, pattern ='.Rdata', full.names = TRUE)
 
-# Parse cohort and AD group
-model_info <- str_match(basename(flist), "^Model\\.(.*?)\\.(AD|advAD|smallAD)\\.LOSO")[, 2:3]
-cohort_names <- model_info[, 1]
-ad_type <- model_info[, 2]
-
-# Load all models into a named list
-all.eval <- setNames(
-  lapply(flist, function(x) {
-    env <- new.env()
-    load(x, envir = env)
-    as.list(env)
-  }),
-  paste(cohort_names, ad_type, sep = "_")
-)
-
-# Helper function to extract model objects by AD type
-get_models_by_type <- function(ad_type_label, loso_key) {
-  relevant_names <- grep(paste0("_", ad_type_label, "$"), names(all.eval), value = TRUE)
-  model_list <- list()
-  for (n in relevant_names) {
-    cohort <- str_replace(n, paste0("_", ad_type_label), "")
-    model <- all.eval[[n]][[loso_key]][[cohort]]
-    model_list[[cohort]] <- model
-  }
-  return(model_list)
+plot_comparison_scatter_ad <- function(
+    data, x_col, y_col, x_label, y_label,
+    p_col_x, p_col_y, feature_column_name = "Bacteria",
+    effect_thresh = 0, padj_thresh = 0.05, theme_obj = theme_paper
+) {
+  
+  x <- data %>%
+    dplyr::mutate(
+      sig_x = !is.na(.data[[p_col_x]]) & (.data[[p_col_x]] < padj_thresh),
+      sig_y = !is.na(.data[[p_col_y]]) & (.data[[p_col_y]] < padj_thresh),
+      up_x  = !is.na(.data[[x_col]])   & (.data[[x_col]]  >  effect_thresh),
+      dn_x  = !is.na(.data[[x_col]])   & (.data[[x_col]]  < -effect_thresh),
+      up_y  = !is.na(.data[[y_col]])   & (.data[[y_col]]  >  effect_thresh),
+      dn_y  = !is.na(.data[[y_col]])   & (.data[[y_col]]  < -effect_thresh),
+      enriched_in = dplyr::case_when(
+        (sig_x & up_x) & (sig_y & up_y) ~ "both in CRC and AD",
+        (sig_x & dn_x) & (sig_y & dn_y) ~ "CTR",
+        TRUE                             ~ "n.s."
+      ),
+      enriched_in = factor(enriched_in, levels = c("both in CRC and AD", "CTR", "n.s.")),
+      label = case_when(enriched_in!="n.s." ~.data[[feature_column_name]],
+                        Taxon %in% c("Fusobacterium","Parvimonas","Peptostreptococcus","Porphyromonas","Gemella") ~ .data[[feature_column_name]],
+                        TRUE ~ ""),
+      font = case_when(enriched_in!="n.s." ~ "bold.italic",
+                        Taxon %in% c("Fusobacterium","Parvimonas","Peptostreptococcus","Porphyromonas","Gemella") ~ "bold.italic",
+                        TRUE ~ "")) %>%
+    dplyr::select(-sig_x, -sig_y, -up_x, -dn_x, -up_y, -dn_y)
+  
+  axis_limits <- range(c(data[[x_col]], data[[y_col]]), na.rm = TRUE)
+  padding <- diff(axis_limits) * 0.05   # 5% margin
+  axis_limits <- c(axis_limits[1] - padding, axis_limits[2] + padding)
+  
+  ggplot(x, aes(x = .data[[x_col]], y = .data[[y_col]])) +
+    geom_point(aes(fill = enriched_in), shape = 21, color = "black", alpha = 0.75, size = 3) +
+    geom_hline(yintercept = 0, color = "grey", lty = "dashed", lwd = 0.3) +
+    geom_vline(xintercept = 0, color = "grey", lty = "dashed", lwd = 0.3) +
+    geom_abline(slope = 1, intercept = 0, color = "grey", lty = "dashed", lwd = 0.3) +
+    ggrepel::geom_text_repel(
+      aes(label = label, fontface = font),
+      color = "black", segment.color = "black",
+      segment.size = 0.2, segment.ncp = 3, max.overlaps = 25,
+      min.segment.length = 0.2, nudge_x = 0.05, nudge_y = 0.05,
+      size = 3, seed = 123
+    ) +
+    scale_fill_manual(values = c("#E19448",  "dodgerblue3", "white")) +
+    theme_obj +
+    theme(
+      legend.box = "horizontal",
+      legend.spacing.y = unit(0.1, "cm"),
+      legend.position = c(.01, .99),
+      legend.key.size = unit(0.75, "lines"),
+      legend.justification = c(0, 1),
+      panel.grid.minor = element_blank(),
+      panel.grid.major = element_blank()
+    ) +
+    labs(fill = paste0("p.adj < ", padj_thresh), x = x_label, y = y_label) +
+    xlim(axis_limits) + ylim(axis_limits) +
+    coord_equal()
 }
 
-# Extract models
-models_ad     <- get_models_by_type("AD", "loso.eval.ad")
-models_AdvAD  <- get_models_by_type("advAD", "loso.eval.adv.ad")
-models_smallAD<- get_models_by_type("smallAD", "loso.eval.small.ad")
 
-# Function to extract AUC and sample size
-extract_model_metrics <- function(models, model_names) {
-  if (length(models) != length(model_names)) {
-    stop("Mismatch: Number of models and names are not equal.")
-  }
-  data.frame(
-    Model = model_names,
-    AUC = sapply(models, function(model) {
-      if (!is.null(model@eval_data$auroc)) model@eval_data$auroc else NA
-    }),
-    Test_Samples = sapply(models, function(model) {
-      if (!is.null(model@phyloseq@sam_data)) nrow(model@phyloseq@sam_data) else NA
-    })
+plot.comp.effect.ad.crc<- plot_comparison_scatter_ad(data=scatter.data, 
+                                                      x_col='Effect.size.CRC', y_col='Effect.size.AD',
+                                                      p_col_x = 'P.adj.CRC', p_col_y = 'P.adj.AD',
+                                                      x_label= 'Effect size (CTR vs CRC)' , y_label = 'Effect size (CTR vs AD)',
+                                                      feature_column_name = 'Taxon')
+
+
+ggsave(plot.comp.effect.ad.crc, file= here('figures','extended.data.figure4','Extended.Data.Figure4d.pdf'), height = 5, width = 5)
+
+
+######################
+# Extended data figure 4e: CRC microbiome signature scores in AD samples
+
+set.seed(200)
+meta.ad <-  read_tsv(here('data','Metadata.all.samples.tsv')) %>% 
+  filter(Condition=='smallAD' | Condition=='AdvAD' | Condition=='AD') %>% 
+  mutate(Condition_general= gsub('AdvAD','AD',Condition)) %>% 
+  mutate(Condition_general= gsub('smallAD','AD',Condition))
+
+all.data <- read.table(here('data','Relab.all.samples.tsv'),sep='\t',check.names = F)  %>%
+  rownames_to_column('genus') %>%
+  filter(genus!='unassigned') %>%
+  column_to_rownames('genus')
+
+ad.data<- all.data[,meta.ad$Sample_ID]
+
+# Load the universal CRC trained model
+load(here('data', 'results', 'Training.unified.crc.model.Rdata'))
+
+dummyControls <- data.frame(dummySample = rpois(n = dim(ad.data)[1], lambda = 10))
+
+rownames(dummyControls) <- rownames(ad.data)
+ad.data <- cbind(ad.data, dummyControls)
+
+
+tmp <- lapply(colnames(ad.data), function(x) {
+  tmp <- data.frame(dummyColumnName = rep(0, sum(!norm_params(models.all.rf)$retained.feat %in% rownames(ad.data))))
+  rownames(tmp) <- norm_params(models.all.rf)$retained.feat[!norm_params(models.all.rf)$retained.feat %in% rownames(ad.data)]
+  colnames(tmp)[1] <- x
+  return(tmp)
+})
+
+ad.data <- rbind(ad.data, as.data.frame(tmp, check.names = F))
+dummyMeta_ad <- data.frame(label = c(rep('CRC', dim(ad.data)[2] - 1 ), 'Control'))
+rownames(dummyMeta_ad) <- colnames(ad.data)
+
+all_features<-unique(norm_params(models.all.rf)$retained.feat)
+
+ad.data <- ad.data %>% 
+  rownames_to_column('rn') %>%
+  complete(rn = union(rn, all_features[which(!all_features%in%rownames(ad.data))])) %>% 
+  column_to_rownames('rn') %>%
+  replace(is.na(.), 0)
+
+
+ad.crc.score <- get_cancerness(siam = models.all.rf, pro = ad.data, meta = dummyMeta_ad ,evaluated.label='Adenoma', evaluated.color = '#FFBA08')
+
+write.table(ad.crc.score[[2]], file=here('data', 'results', 'Adenoma.CRC.microbiome.signature.scores.tsv'), sep='\t',quote = F,row.names = F)
+
+# Save the plot
+ggsave(ad.crc.score[[1]], file= here('figures','extended.data.figure4','Extended.Data.Figure4e.pdf'),width = 7, height = 7)
+
+######################
+# Extended data figure 4h: Shap value calculation for AD model 
+
+shap_values<- read_tsv(here("data","results","shap.analysis", "AD_median_shap_value.tsv")) %>% 
+  mutate(feature= as.factor(feature))
+
+perc_mean_shap<-shap_values %>%
+  select(feature, shap_value) %>%
+  group_by(feature) %>%
+  summarise(mean_abs_shap = mean(abs(shap_value)), .groups = "drop") %>%
+  mutate(percentage = mean_abs_shap / sum(mean_abs_shap) * 100)
+
+l <- levels(shap_values$feature) 
+
+shap_values$feature <- factor(shap_values$feature, levels = rev(l))
+
+feature_order <- shap_values %>%
+  group_by(feature) %>%
+  summarize(
+    mean_abs_shap = mean(abs(shap_value), na.rm = TRUE),
+    spearman_sign = unique(spearman_sign),
+    .groups = "drop"
+  ) %>%
+  arrange(
+    desc(spearman_sign),  # Positive correlations first
+    ifelse(spearman_sign == 1, -mean_abs_shap, mean_abs_shap)
+  ) %>%
+  mutate(feature_ordered = factor(feature, levels = feature))
+
+
+top_features <- feature_order %>%
+  arrange(desc(mean_abs_shap)) %>%
+  slice(1:25) %>%
+  pull(feature)
+
+shap_values <- shap_values %>%
+  filter(feature %in% top_features) %>%
+  left_join(feature_order %>% select(feature, feature_ordered), by = "feature") %>%
+  mutate(
+    feature_ordered = factor(feature, levels = levels(feature_order$feature_ordered))
   )
-}
 
-# Extract metrics
-model_names_ad     <- names(models_ad)
-model_names_adv    <- names(models_AdvAD)
-model_names_small  <- names(models_smallAD)
-
-AD_metrics     <- extract_model_metrics(models_ad, model_names_ad)
-AdvAD_metrics  <- extract_model_metrics(models_AdvAD, model_names_adv)
-smallAD_metrics<- extract_model_metrics(models_smallAD, model_names_small)
-
-# Merge wide format table
-AD_loso_all_auc_df <- AD_metrics %>%
-  left_join(AdvAD_metrics, by = "Model", suffix = c(".AD", ".AdvAD")) %>%
-  left_join(smallAD_metrics, by = "Model") %>%
-  rename(AUC.SmallAD = AUC, Test_Samples.SmallAD = Test_Samples)
-
-# Save to file
-# write.table(AD_loso_all_auc_df, here('data' ,'results', 'LOSO.AD.all.AUC.table.tsv', quote = FALSE, sep = '\t', row.names = FALSE)
-
-# Reshape to long format for plotting
-AD_loso_all_auc_long <- AD_loso_all_auc_df %>%
-  select(Model, AUC.AD, AUC.AdvAD, AUC.SmallAD) %>%
-  pivot_longer(cols = starts_with("AUC."),
-               names_to = "AD_group", values_to = "AUC") %>%
-  mutate(AD_group = recode(AD_group,
-                           "AUC.AD" = "AD",
-                           "AUC.AdvAD" = "AdvAD",
-                           "AUC.SmallAD" = "SmallAD"))
-
-AD_loso_all_samples_long <- AD_loso_all_auc_df %>%
-  select(Model, Test_Samples.AD, Test_Samples.AdvAD, Test_Samples.SmallAD) %>%
-  pivot_longer(cols = starts_with("Test_Samples."),
-               names_to = "AD_group", values_to = "Test_Samples") %>%
-  mutate(AD_group = recode(AD_group,
-                           "Test_Samples.AD" = "AD",
-                           "Test_Samples.AdvAD" = "AdvAD",
-                           "Test_Samples.SmallAD" = "SmallAD"))
-
-# Merge long format AUC and sample count
-AD_loso_all_long <- left_join(AD_loso_all_auc_long, AD_loso_all_samples_long,
-                              by = c("Model", "AD_group")) %>% drop_na(AUC)
-
-
-
-
-# #count number of models generated for each dataset, if there are two these are same models so remove AD model
-# the reason of this is I combined small ad and Adv ad samples as AD and trained a model 
-model_auc_counts <- AD_loso_all_long %>% 
-  group_by(Model) %>%
-  summarize(n_auc = sum(!is.na(AUC)))
-
-df_filtered <- AD_loso_all_long %>%
-  left_join(model_auc_counts, by = "Model") %>%
-  filter(!(n_auc == 2 & AD_group == "AD")) %>%
-  select(-n_auc)  
-
-colours_ad <- unlist(plotting$color_mapping_ad)
-
-# Create the plot
-auc_all_ad_plot<-ggplot(df_filtered, aes(x = Model, y = AUC, shape = AD_group, color=Model)) +
-  geom_point(size = 5, alpha= 0.7) + 
-  geom_hline(yintercept = 0.5, linetype='dashed', color='grey',size=0.8)+
-  labs(title = "LOSO AD evaluations (trained on CRC)",
-       x = "Model",
-       y = "AUC",
-       color = "Test",
-       shape= 'Group') + 
-  scale_color_manual(values=colours_ad) +
-  theme_paper +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-auc_all_ad_plot
-
-
-ggsave(auc_all_ad_plot, file=here('figures','figure4','Figure4b.pdf'),width = 7, height = 7)
-
-
-######################
-# Extended data figure 4c
-
-load(here('data','results','Training.ad.ctr.rf.model.Rdata'))
-
-models <- list(models.ad)
-labels <- c("AD Classifier CV:")
-trained_on <- list(NULL)
-colours <- c( "#FFBA08")
-
-ad_auc_plot<- plot_roc_siamcat_models(models, labels, colours, trained_on,alpha=0.8)
-
-ggsave(ad_auc_plot, file=here('figures','extended.data.figure4','Extended.Data.Figure4c.pdf'),width = 6, height = 6)
-
-
-######################
-# Extended data figure 4d
-
-load(here('data','results','Training.unified.crc.model.Rdata'))
-
-# calculate prevalance of top 4 genera for each stage
-
-top_genera <- c("Fusobacterium", "Peptostreptococcus", "Parvimonas", "Porphyromonas")
-
-# Get metadata and prediction matrix
-all.meta <- models.all.rf@phyloseq@sam_data %>% data.frame()
-all.meta$sampleID <- rownames(all.meta)
-
-CvpredMatrix <- models.all.rf@pred_matrix %>%
-  as.data.frame() %>%
-  rownames_to_column('sampleID') %>%
-  pivot_longer(-sampleID, names_to = "Fold", values_to = "Pred") %>%
-  group_by(sampleID) %>%
-  summarize(medianPredictionProb = median(Pred), .groups = "drop") %>%
-  left_join(all.meta, by = "sampleID")
-
-# Compute threshold (90% specificity) using ROC on CRC vs CTR
-roc_curve <- roc(
-  response = CvpredMatrix$Condition == "CRC",
-  predictor = CvpredMatrix$medianPredictionProb)
-threshold <- roc_curve$thresholds[which(roc_curve$specificities >= 0.9)[1]]
-
-meta.ad <- read_tsv(here("data", "Metadata.all.samples.tsv")) %>%
-  filter(Condition %in% c("smallAD", "AdvAD", "AD"))
-meta.yachida <- meta.ad %>% filter(Cohort == "YachidaS_2019")
-
-all.data <- read.table(here("data", "Relab.all.samples.tsv"), sep = '\t', check.names = FALSE) %>%
-  rownames_to_column("genus") %>%
-  filter(genus != "unassigned") %>%
-  column_to_rownames("genus")
-
-# Get 90th percentile threshold from CTR samples
-ctr_data <- models.all.rf@phyloseq@otu_table %>%
-  as.data.frame() %>%
-  rownames_to_column("genus") %>%
-  pivot_longer(-genus, names_to = "sampleID", values_to = "Relab") %>%
-  filter(genus %in% top_genera) %>%
-  left_join(all.meta, by = c("sampleID")) %>%
-  filter(Condition == "CTR")
-
-prevalence_threshold <- ctr_data %>%
-  group_by(genus) %>%
-  summarize(threshold = quantile(Relab, 0.9), .groups = "drop")
-
-
-# Get CRC stage-wise prevalence for Yachida
-crc_prevalence_data_stages_yachida <- models.all.rf@phyloseq@otu_table %>%
-  as.data.frame() %>%
-  rownames_to_column("genus") %>%
-  pivot_longer(-genus, names_to = "sampleID", values_to = "Relab") %>%
-  filter(genus %in% top_genera) %>%
-  left_join(all.meta, by = "sampleID") %>%
-  filter(Cohort == "YachidaS_2019") %>%
-  filter(!(Condition == "CTR" & Stage == 0)) %>%
-  left_join(prevalence_threshold, by = "genus") %>%
-  group_by(Stage, genus) %>%
-  summarize(Prevalence = mean(Relab >= threshold) * 100, .groups = "drop") %>%
-  mutate(Stage=as.character(Stage))
-
-# Get adenoma stage-wise prevalence for Yachida
-ad_prevalence_data_stages_yachida <- all.data[, meta.yachida$Sample_ID] %>%
-  rownames_to_column("genus") %>%
-  pivot_longer(-genus, names_to = "SampleID", values_to = "Relab") %>%
-  filter(genus %in% top_genera) %>%
-  left_join(meta.ad %>% select(Stage = Condition, Sample_ID), by = c("SampleID"='Sample_ID' )) %>%
-  left_join(prevalence_threshold, by = "genus") %>%
-  group_by(Stage, genus) %>%
-  summarize(Prevalence = mean(Relab >= threshold) * 100, .groups = "drop") 
-
-# Combine prevalence data
-prevalance_all_stages_yachida <- bind_rows(crc_prevalence_data_stages_yachida, ad_prevalence_data_stages_yachida) %>%
-  drop_na() %>%
-  mutate(Stage = case_when(
-    Stage == 0 ~ "Stage 0",
-    Stage == 1 ~ "Stage I",
-    Stage == 2 ~ "Stage II",
-    Stage == 3 ~ "Stage III",
-    Stage == 4 ~ "Stage IV",
-    TRUE ~ as.character(Stage)
-  )) %>%
-  mutate(Stage = factor(Stage, levels = c("smallAD", "Stage 0", "Stage I", "Stage II", "Stage III", "Stage IV"))) %>%
-  mutate(genus = factor(genus, levels = rev(top_genera)))
-
-
-prev_heatmap_stages_yachida <- ggplot(prevalance_all_stages_yachida, aes(x = genus, y = Stage, fill = Prevalence)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = sprintf("%.1f%%", Prevalence)), vjust = 1, color = "black") +
-  scale_fill_gradient(low = "white", high = "black", limits = c(0, 100)) +
-  theme_minimal() +
-  labs(x = "Tumor Stage", y = "Genus", fill = "Positivity (%)") +
-  theme_paper +
-  theme(
-    axis.text.y = element_blank(),
-    axis.title = element_blank(),
-    legend.position = "right",
-    axis.text.x = element_text(size = 12),
-    axis.ticks.x = element_line(),
-    axis.text.x.bottom = element_text(size = 12, angle = 90),
-    legend.title = element_text(size = 12),
-    legend.text = element_text(size = 10),
-    axis.ticks.y = element_blank()
+# Plotting
+plot <- ggplot() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  geom_point(data = shap_values, aes(x = shap_value, y = feature_ordered, color = feature_value),
+             position = position_jitter(height = 0.45, width = 0), alpha = 0.5, size = 1) +
+  geom_point(data = shap_values %>%
+               group_by(feature) %>%
+               summarize(n = mean(abs(shap_value)) * spearman_sign) %>%
+               distinct(), aes(x = n, y = feature), shape = 18, color = 'black', size = 1.5, inherit.aes = F) +
+  geom_point(data = shap_values %>%
+               group_by(feature) %>%
+               summarize(n = mean(abs(shap_value)) * spearman_sign) %>%
+               distinct(), aes(x = n, y = feature), shape = 5, color = 'black', size = 1.5, inherit.aes = F) +
+  theme_presentation() +
+  coord_flip() +
+  scale_color_gradientn(
+    colors = c("dodgerblue3", "white", "#FEE391"),
+    limits = c(-3, 3),
+    oob = scales::squish
   ) +
-  scale_y_discrete(limits = rev(levels(prevalance_all_stages_yachida$Stage)))
-
-# Get TPR per stage (CRC)
-df.plot.yachida <- CvpredMatrix %>%
-  filter(Cohort == "YachidaS_2019") %>%
-  mutate(Stage = case_when(
-    Stage == 0 ~ "Stage 0",
-    Stage == 1 ~ "Stage I",
-    Stage == 2 ~ "Stage II",
-    Stage == 3 ~ "Stage III",
-    Stage == 4 ~ "Stage IV",
-    TRUE ~ as.character(Stage)
-  )) %>%
-  mutate(Stage = if_else(Condition == "CTR" & Stage == "Stage 0", NA_character_, Stage)) %>%
-  group_by(Stage) %>%
-  summarize(tp = sum(medianPredictionProb > threshold), n = n(), .groups = "drop") %>%
-  mutate(tpr = tp / n, StageLabel = paste0(Stage, "\n (N:", n, ")")) %>%
-  drop_na(Stage)
-
-
-# Get TPR per stage (Adenomas)
-AD.predictions <- read_tsv(here("data", "results", "Adenoma.CRC.microbiome.signature.scores.tsv"))
-
-Ad.df.plot.yachida <- AD.predictions %>%
-  left_join(meta.ad %>% select(Sample_ID, Cohort,Condition), by = c("sampleID" = "Sample_ID")) %>%
-  filter(Cohort == "YachidaS_2019") %>%
-  rename(Stage = Condition) %>%
-  group_by(Stage) %>%
-  summarize(tp = sum(medianPredictionProb > threshold), n = n(), .groups = "drop") %>%
-  mutate(tpr = tp / n, StageLabel = paste0(Stage, "\n (N:", n, ")")) %>%
-  drop_na(Stage)
-
-# Combine TPR data
-df.plot.yachida <- bind_rows(df.plot.yachida, Ad.df.plot.yachida) %>%
-  mutate(Stage = factor(Stage, levels = c("smallAD", "Stage 0", "Stage I", "Stage II", "Stage III", "Stage IV")),
-         StageLabel = factor(StageLabel, levels = rev(c(
-           "smallAD\n (N:67)", "Stage 0\n (N:69)", "Stage I\n (N:73)",
-           "Stage II\n (N:35)", "Stage III\n (N:51)", "Stage IV\n (N:20)"
-         ))))
-
-# Plot TPR barplot
-g.y <- ggplot(df.plot.yachida, aes(x = tpr, y = StageLabel, fill = Stage)) +
-  geom_bar(stat = "identity", color = "black") +
-  theme_classic() +
-  scale_x_continuous(limits = c(0, 1)) +
-  xlab("") +
-  ylab("True positive rate") +
-  scale_fill_manual(values = c("#FFBA08", "#F48C06", "#E85D04", "#DC2F02", "#D00000", "#9D0208", "#6A040F"), guide = FALSE) +
-  theme_paper +
+  scale_shape_manual(values = c("AD" = 16, "CTR" = 1)) +
+  xlab("SHAP value") +
+  ylab("Genus") +
   theme(
-    axis.text.x = element_text(angle = 50, hjust = 1, vjust = 1, size = 14),
-    axis.text.y = element_text(size = 14),
-    panel.grid.major.y = element_line(colour = "lightgrey")
+    axis.text.x = element_text(size=6, angle=30, hjust=1), # Smaller x-axis text
+    axis.text.y = element_text(size=6), # Smaller y-axis text
+    axis.title.x = element_blank(), # Smaller x-axis title
+    axis.title.y = element_text(size=7), # Smaller y-axis title
+    axis.ticks.length = unit(0.5, "mm"), # Make tick marks shorter
+    legend.position = c(0.95, 0.95), # Top-right corner inside the plot
+    legend.justification = c("right", "top"), # Align legend to top-right
+    legend.direction = "horizontal", # Arrange legend items horizontally
+    legend.text = element_text(size=6), # Reduce legend text size
+    legend.title = element_text(size=7), # Reduce legend title size
+    legend.key.size = unit(4, "mm") # Reduce legend key size
   )
 
-# Combine both panels
-final_plot_yachida <- plot_grid(
-  g.y, prev_heatmap_stages_yachida,
-  align = "h",
-  axis = "l",
-  rel_heights = c(1, 1),
-  rel_widths = c(0.6, 1),
-  ncol = 2
-)
-
-# Save figure
-ggsave(final_plot_yachida, filename = here("figures", "extended.data.figure4", "Extended.Data.Figure4d.pdf"),width = 6, height = 6)
+plot_up_data <- shap_values %>%
+  select(feature_ordered, spearman_sign) %>%
+  distinct() %>%
+  left_join(perc_mean_shap %>% select(feature, percentage), by = c('feature_ordered' = 'feature')) %>%
+  mutate(perc_signed = percentage * spearman_sign)
 
 
+plot_up <- ggplot(plot_up_data, aes(x = perc_signed / 100, y = feature_ordered)) +
+  geom_col(fill = 'grey66') +
+  geom_text(
+    aes(
+      label = paste0(round(percentage, 1), '%'),
+      x = perc_signed + ifelse(perc_signed >= 0, 1, -1), 
+      hjust = ifelse(perc_signed >= 0, 0, 1)  
+    ),
+    fontface = 'bold',
+    color = 'black',
+    size = 2
+  )+
+  
+  theme_presentation() +
+  coord_flip() +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.text.y = element_text(size = 6), 
+    axis.title.y = element_text(size = 7)
+  ) +
+  xlab("Relative contribution")
 
-
-
-
-
-
-
+# Save the combined plot with adjusted sizes
+ggsave(plot, file=here('figures','extended.data.figure4','Extended.Data.Figure4h.pdf'), dpi=300, width=8, height=6)

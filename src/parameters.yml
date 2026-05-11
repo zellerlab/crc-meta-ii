@@ -1,8 +1,7 @@
 #######
 # Meta-analysis reveals a universal microbiome signature for colorectal cancer irrespective of onset age and sequencing method
 # Pekel, Karcher et al.
-# Parameters file for visualization
-# by Selin Pekel
+# Parameters file for visualization by Selin Pekel
 #######
 
 plotting:

@@ -1,12 +1,12 @@
 #!/bin/bash 
 # SLURM job settings
-#SBATCH -A your_project_account       # Replace with your SLURM project/account name
-#SBATCH --time=2-00:00:00             # Max wall time (2 days)
-#SBATCH --mem=64G                     # Memory per job (adjust if needed)
-#SBATCH --cpus-per-task=1            # Number of CPUs per task
-#SBATCH --ntasks=1                   # One task per job
-#SBATCH --array=1-300               # Job array for parallel SHAP runs
-#SBATCH --job-name=get_shap          # Job name
+#SBATCH -A your_project_account       
+#SBATCH --time=2-00:00:00             
+#SBATCH --mem=64G                     
+#SBATCH --cpus-per-task=1          
+#SBATCH --ntasks=1               
+#SBATCH --array=1-400               
+#SBATCH --job-name=get_shap          
 
 # ------------------------------
 # Script for running SHAP testing in array mode

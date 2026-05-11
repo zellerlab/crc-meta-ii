@@ -2,7 +2,7 @@
 # SHAP value extraction and annotation
 ######################
 # This script loads trained machine learning models, SHAP value objects, and microbial 
-# abundance profiles for a given dataset (e.g., Alldata(Unified CRC classifier), EO-CRC, LO-CRC). 
+# abundance profiles for a given dataset (e.g., Alldata(Unified CRC classifier),AD, EO-CRC, LO-CRC). 
 # It extracts metadata (fold, resampling round, model type), aligns SHAP values with profile data, 
 # and computes the median SHAP values per feature/sample. 
 #
@@ -224,7 +224,8 @@ get_shap_median <- function(dataset, label_case, model_types_to_evaluate) {
 for (dataset in c(
   "Alldata",
   "EO-CRC",
-  "LO-CRC"
+  "LO-CRC",
+  "AD"
 )) {
   get_shap_median(dataset = dataset, label_case = "1", model_types_to_evaluate = c("RF"))
 }

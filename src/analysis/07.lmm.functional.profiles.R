@@ -5,7 +5,6 @@
 # (virulence factors, KEGG orthologs, KEGG modules, KEGG pathways, and gut metabolic modules)
 # between colorectal cancer (CRC) and control (CTR) samples in WGS datasets.
 
-
 source(here('src','utils.R'))
 
 ######################

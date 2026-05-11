@@ -91,3 +91,56 @@ lmm.table.eo.lo.ctr <- run_lmem(
 # Save EO/LO comparison results
 save(lmm.table.lo, lmm.table.eo, lmm.table.eo.lo.crc, lmm.table.eo.lo.ctr,
      file = here('data', 'results', 'lmm.tables.eo.lo.Rdata'))
+
+
+
+
+# Additional analyses for EO vs LO comparisons using different age cutoffs (50, 55, 60 years)
+# Filter for genera present in >10% of samples
+
+age_cutoffs <- c(40, 45, 55)
+
+lmm.eo.list <- list()
+
+for (cutoff in age_cutoffs) {
+  message("LMM EO-CRC (cutoff: ", cutoff, ") vs EO-CTR")
+  
+  ## 1) Recreate EO/LO grouping for this cutoff
+  if (cutoff == 55) {
+    meta_age <- all.meta %>%
+      rownames_to_column("Sample_ID") %>%
+      mutate(
+        !!age_col := as.numeric(.data[[age_col]]),
+        Onset = case_when(
+          Age_status == "Early onset"        ~ "EO",
+          .data[[age_col]] <  cutoff         ~ "EO",
+          .data[[age_col]] >= cutoff         ~ "LO",
+          TRUE                               ~ NA_character_
+        ),
+        Group_age = paste0(Onset, "-", Condition)
+      )
+  } else {
+    meta_age <- all.meta %>%
+      rownames_to_column("Sample_ID") %>%
+      mutate(
+        !!age_col := as.numeric(.data[[age_col]]),
+        Onset    = if_else(.data[[age_col]] < cutoff, "EO", "LO"),
+        Group_age = paste0(Onset, "-", Condition)
+      )
+  }
+  
+  meta_age<- meta_age %>% filter(Onset=='EO')
+  
+  print(meta_age %>% count(Group_age))
+  
+  data_age <-all.data[, meta_age$Sample_ID]
+  
+  lmm.eo.list[[as.character(cutoff)]] <- run_lmem(
+    data_df = data_age,
+    meta_df  = meta_age, column_name='Group_age', ref_group='EO-CTR')
+  
+}
+
+lmm.eo.list[["50"]]<- lmm.table.eo
+
+save(lmm.eo.list,file=here('data','results', 'lmm.tables.eo.diff.cutoff.Rdata') ) 

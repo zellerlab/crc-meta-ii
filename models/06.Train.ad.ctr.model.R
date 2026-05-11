@@ -1,6 +1,5 @@
-######################
+##########################################
 # Train Adenoma ml model
-######################
 
 # Load functions
 source(here('src','utils.R'))

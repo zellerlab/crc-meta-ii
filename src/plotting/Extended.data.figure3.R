@@ -3,10 +3,6 @@
 ######################
 
 source(here('src','utils.R'))
-
-######################
-# Extended data figure 3a
-
 load(here('data','results', 'lmm.tables.16S.WGS.Rdata'))
 
 lmm.table.motu.filtered <- lmm.table.motu %>%
@@ -136,13 +132,11 @@ for (file in selected_files) {
   loso.eval[[model_name]] <- loso.eval.crc[[model_name]]
 }
 
-
-## Calculate FPR and TPR for FOBT/FIT status
+# Calculate FPR and TPR for FOBT/FIT status
 result_list<- list()
 
 for(i in 1:length(loso.eval)){
   
-  # metadata <- data.frame(loso.eval[[i]]@phyloseq@sam_data) # Ensure it is a data.frame
   metadata <- FOBT_meta %>%  filter(Cohort==names(loso.eval)[i])
   head(metadata)
   
@@ -196,7 +190,6 @@ for(i in 1:length(loso.eval)){
 
 result_df <- do.call(rbind, lapply(result_list, as.data.frame)) 
 
-
 #Load trained siamcat object for loso models (to get training sample size)
 
 model_path <- here('data','results','scv.loso','crc.loso.train')
@@ -233,7 +226,6 @@ plot<-plot_roc_siamcat_models_with_fobt(models = models , labels = labels, linet
 
 
 ggsave(plot = plot, filename = here('figures','extended.data.figure3','Extended.Data.Figure3c.pdf'),width = 7, height = 7)
-
 
 ######################
 # Extended data figure 3d:  Heatmap of study to study transfer(SST) models  

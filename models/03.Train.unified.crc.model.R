@@ -1,6 +1,5 @@
 ######################
 # Train unified CRC ml model
-######################
 
 # Load functions
 source(here('src','utils.R'))
@@ -24,7 +23,6 @@ save(models.all.rf, file=here('data','results','Training.unified.crc.model.Rdata
 
 
 # Plot unified CRC model
-
 models <- list(models.all.rf)
 labels <- c("Classifier cross validated on CRC")
 colours <- c( "black" )

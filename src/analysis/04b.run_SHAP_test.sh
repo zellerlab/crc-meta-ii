@@ -6,7 +6,7 @@ do
 			do
 			for which_model in RF
 				do
-				for dataset in EO-CRC LO-CRC Alldata
+				for dataset in EO-CRC LO-CRC Alldata AD
 				do
 					echo -e "Rscript run_SHAP_test.R ${r_id} ${f_id} ${on_what} ${which_model} ${dataset}"
 				done

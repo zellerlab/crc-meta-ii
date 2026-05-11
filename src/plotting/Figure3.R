@@ -15,10 +15,8 @@ world <- map_data('world')
 
 meta<- read.table(here( 'data', 'Metadata.all.samples.balanced.tsv'), header = T, sep = '\t') %>% select(Country, Cohort) 
 
-
 country.count<- meta %>%  group_by(Country) %>% unique() %>% 
   summarise(Number_of_Cohorts = n())
-
 
 country_names <- c(
   ARG = 'Argentina', AUS = 'Australia', CAN = 'Canada', CHL = 'Chile', CHN = 'China',
@@ -28,7 +26,6 @@ country_names <- c(
 
 sample_counts_per_country <- meta %>%
   dplyr::count(Country)
-
 
 sample_counts_per_country <- sample_counts_per_country %>%
   mutate(
@@ -115,14 +112,12 @@ worldplot <- ggplot() +
     legend.position = 'bottom'
   )
 
-
 ggsave(plot = worldplot, file= here('figures','figure3','Figure3a.pdf') , height = 8,width = 10)
 
 ######################
 # Figure 3b: AUROC for unified CRC model
 
 # Load unified model
-
 load(here('data','results','Training.unified.crc.model.Rdata'))
 
 models <- list(models.all.rf)
@@ -149,7 +144,6 @@ for (path in path.CRC.LOSO.test) {
   LOSO.evaluated.CRC[[list_name]] <- loso.eval.crc[[list_name]]
 }
 
-
 # Load SCV and SST models 
 load(here('data','results','scv.loso','crc.scv.sst','Models.SCV.SST.Rdata'))
 
@@ -160,7 +154,6 @@ SST.eval.CRC<- holdout.evaluation.crc
 SCV_metrics <- get_siamcat_holdout_metrics(siamcat_list_cv = SCV.CRC, siamcat_list_holdout = SST.eval.CRC)
 
 LOSO_CRC_metrics<- get_siamcat_loso_metrics(LOSO.evaluated.CRC)
-
 
 # Combine SCV and LOSO dataframes
 df <- rbind(SCV_metrics, LOSO_CRC_metrics)
@@ -186,8 +179,6 @@ all.meta<- read.table(here('data','Metadata.all.samples.balanced.tsv'), sep = '\
   filter(Condition=='CRC'| Condition=='CTR') %>% as.data.frame() 
 
 # Load seqdepth and genus richness 
-
-
 seqdepth<- read.table(here('data','Sequencing_depth.tsv'),sep = '\t',header = T)
 
 seqdepth.mean <- seqdepth %>% 
@@ -196,7 +187,6 @@ seqdepth.mean <- seqdepth %>%
   mutate(Assay= factor(Assay, levels=c('WGS','16S'))) %>% 
   group_by(Cohort) %>% 
   summarise(mean_seqdepth= mean(Seq_depth))
-
 
 # Summarize the data for plotting
 df_summary <- df %>%
@@ -211,14 +201,12 @@ df_average <- df_summary %>%
             mean_AUC = mean(mean_AUC),
             .groups = 'drop')
 
-
 # Precompute ymin and ymax for the CV and LOSO rectangles
 cv_ymin <- subset(df_average, Type == 'CV')$mean_AUC - subset(df_average, Type == 'CV')$std_AUC
 cv_ymax <- subset(df_average, Type == 'CV')$mean_AUC + subset(df_average, Type == 'CV')$std_AUC
 
 loso_ymin <- subset(df_average, Type == 'LOSO')$mean_AUC - subset(df_average, Type == 'LOSO')$std_AUC
 loso_ymax <- subset(df_average, Type == 'LOSO')$mean_AUC + subset(df_average, Type == 'LOSO')$std_AUC
-
 
 # Arrange Tests based on Assay type
 df <- df %>% 
@@ -236,13 +224,6 @@ get_limits <- function(df, assay_type) {
     pull(mean_libsize) %>%
     range()
 }
-
-theme_paper <- ggembl::theme_presentation() +
-  theme(
-    axis.title = element_text(face = 'bold', size = 12), # Bold axis titles
-    panel.border = element_rect(fill=NA, colour='black', size=1.5),
-    axis.text = element_text(face = 'bold', size = 12),
-  )
 
 # Combine Test and Number_of_Samples for x-axis labels
 df <- df %>%
@@ -265,9 +246,7 @@ df <- df %>%
     'ZhouZ_2022 (N = 36)'
   )))
 
-
-
-write.table(df %>% select(-Test_Label), file = here('data','results','ALl.predictions.LOSO.SST.SCV.models.tsv'), sep = '\t' ,quote = F )
+write.table(df %>% select(-Test_Label), file = here('data','results','All.predictions.LOSO.SST.SCV.models.tsv'), sep = '\t' ,quote = F )
 
 # Create the plot
 Auc.loso.cv.scv.plot <- ggplot(df) +
@@ -310,9 +289,6 @@ Auc.loso.cv.scv.plot <- ggplot(df) +
   ) +
   geom_hline(yintercept = 0.5, linetype = 'dotted', linewidth = 1.3, color = 'gray') 
 
-# Print the plot
-print(Auc.loso.cv.scv.plot)         
-
 # Create the box plot with individual sample points
 seqdepth<- seqdepth %>% left_join(df %>% select(Cohort= Train, Test_Label) %>% drop_na(Test_Label), by='Cohort')
 
@@ -339,8 +315,6 @@ seq_depth_plot<-ggplot(seqdepth, aes(x = Test_Label, y = log10(Seq_depth))) +
   )+
   guides(color='none')
 
-
-
 # Adjust Auc.loso.cv.scv.plot to ensure consistent x-axis
 Auc.loso.cv.scv.plot <- Auc.loso.cv.scv.plot +
   theme(
@@ -357,16 +331,13 @@ seq_depth_plot <- seq_depth_plot +
     axis.title.x = element_blank()  
   )
 
-
-diversity_richness_df<- read.table(file = '/g/scb/zeller/pekel/meta_analysis/data/results/Diversity.richness.CRC.CTR.groups.tsv',sep = '\t', header = T) %>% 
+diversity_richness_df<- read.table(file = here('data', 'results','Diversity.richness.CRC.CTR.groups.tsv'),sep = '\t', header = T) %>% 
   select(-Test_Label)
-
 
 diversity_richness_df<- diversity_richness_df %>% 
   left_join(df %>% select(Test, Test_Label) %>% drop_na(), 
             by=c('Cohort'='Test')) %>% 
   mutate(Assay=factor(Assay, levels=c('WGS','16S')))
-
 
 richness<-ggplot(diversity_richness_df, aes(x = Test_Label, y = Genus.richness)) +
   geom_boxplot(outlier.shape = NA, color = 'black') + 
@@ -392,8 +363,6 @@ richness<-ggplot(diversity_richness_df, aes(x = Test_Label, y = Genus.richness))
   )+
   guides(color='none')
 
-
-
 # Combine plots with vertical alignment on the x-axis
 final_plot <- plot_grid(
   Auc.loso.cv.scv.plot,
@@ -407,15 +376,12 @@ final_plot <- plot_grid(
 
 ggsave(plot = final_plot, file= here('figures','figure3','Figure3c.pdf') , height = 10,width = 10)
 
-
 ######################
-# Figure 3d: 
+# Figure 3d: SHAP values for the unified CRC model
+# Calculate the percantage of the mean absolute shap value too see how much contribute each feature to the unified model
 
 shap_values<- read_tsv(here("data","results","shap.analysis", "Alldata_median_shap_value.tsv")) %>% 
   mutate(feature= as.factor(feature))
-
-
-#calculate the percantage of the mean absolute shap value too see how much contribute each feature to the unified model
 
 perc_mean_shap<-shap_values %>%
   select(feature, shap_value) %>%
@@ -440,12 +406,10 @@ feature_order <- shap_values %>%
   ) %>%
   mutate(feature_ordered = factor(feature, levels = feature))
 
-
 top_features <- feature_order %>%
   arrange(desc(mean_abs_shap)) %>%
   slice(1:10) %>%
   pull(feature)
-
 
 shap_values <- shap_values %>%
   filter(feature %in% top_features) %>%
@@ -454,6 +418,7 @@ shap_values <- shap_values %>%
     feature_ordered = factor(feature, levels = levels(feature_order$feature_ordered))
   )
 
+# Plotting
 plot <- ggplot() +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
   geom_point(data = shap_values, aes(x = shap_value, y = feature_ordered, color = feature_value),
@@ -496,20 +461,8 @@ plot_up_data <- shap_values %>%
   left_join(perc_mean_shap %>% select(feature, percentage), by = c('feature_ordered' = 'feature')) %>%
   mutate(perc_signed = percentage * spearman_sign)
 
-
-plot_up <- ggplot(plot_up_data, aes(x = perc_signed, y = feature_ordered)) +
+plot_up <- ggplot(plot_up_data, aes(x = perc_signed / 100, y = feature_ordered )) +
   geom_col(fill = 'grey66') +
-  geom_text(
-    aes(
-      label = paste0(round(percentage, 1), '%'),
-      x = perc_signed + ifelse(perc_signed >= 0, 1, -1),  # small nudge
-      hjust = ifelse(perc_signed >= 0, 0, 1)  # align text away from bar
-    ),
-    fontface = 'bold',
-    color = 'black',
-    size = 2
-  )+
-
   theme_presentation() +
   coord_flip() +
   geom_vline(xintercept = 0, linetype = "dashed", color = "red") +

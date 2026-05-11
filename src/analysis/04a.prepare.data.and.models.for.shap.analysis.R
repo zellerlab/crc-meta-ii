@@ -8,18 +8,20 @@ library(here)
 
 model_type <- 'RF'
 
-for (dataset in c("EO-CRC",'LO-CRC','Alldata')) {
+for (dataset in c("EO-CRC",'LO-CRC','Alldata', 'AD')) {
 
     dataset_name_path_map <- list(
       'EO-CRC'= here('data','results','Training.eo.lo.crc.rf.models.Rdata'),
       'LO-CRC'=  here('data','results','Training.eo.lo.crc.rf.models.Rdata'),
-      "Alldata" = here('data','results','Training.unified.crc.model.Rdata')
+      "Alldata" = here('data','results','Training.unified.crc.model.Rdata'),
+      'AD' = here('data','results','Training.ad.ctr.rf.model.Rdata')
     )
 
     dataset_name_model_object_map <- list(
       "Alldata" = 'models.all.rf',
       'EO-CRC'= 'models.eo.rf',
-      'LO-CRC'='models.lo.rf'
+      'LO-CRC'='models.lo.rf',
+      'AD' ='models.ad'
     )   
 
     extractFold <- function(siamcatObject, what_fold = NULL) {

@@ -1,12 +1,11 @@
-
+##########################################
+# Train single study models for CRC vs CTR and test them across studies (SCV-SST)
 
 # Load functions
 source(here('src','requirements.R'))
 source(here('src','utils.R'))
 
-
 # Load metadata and data
-
 all.meta<- read_tsv(here('data','Metadata.all.samples.balanced.tsv')) %>% filter(Condition=='CRC'| Condition=='CTR') %>% as.data.frame() %>% column_to_rownames('Sample_ID')
 
 all.data <- read.table(here('data', 'Relab.all.samples.balanced.tsv'),sep='\t', check.names = F) %>%
@@ -36,7 +35,6 @@ for (study in (studies)){
   
 
 }
-
 
 # Make study to study transfer predictions 
 

@@ -1,12 +1,9 @@
-##############################
+##########################################
 # LOSO Training & Evaluation
-##############################
 
 # Load libraries
-
-# The script run on bash with running together with requirem
-
-# Script runs loso model for each datasets
+# The script run on bash with an argument for the study to be left out for LOSO training and evaluation
+# Usage: Rscript models/Train.LOSO.rf.models.R <Study_Name>
 
 commmandArgs <- commandArgs(trailingOnly = TRUE)
 
@@ -74,7 +71,6 @@ cat('LOSO model successfully tested on CRC for the study', study, '\n')
 
 save(loso.eval.crc, file=paste0(here('data','results','scv.loso','crc.loso.test/'),'Model.',study,'.CRĆ.LOSO.test.Rdata'))
 
-
 # Evaluate LOSO Model on AD Samples
 
 # Load complete metadata including all AD classes
@@ -137,59 +133,3 @@ if (study %in% ad.studies) {
 }
 
 
-
-# Evaluate on smallAD Subtype
-
-if ('smallAD' %in% meta.test$Condition) {
-  
-  # Filter and check dataset
-  meta.test.small <- meta.test %>% filter(Condition %in% c('smallAD', 'CTR'))
-  if (length(unique(meta.test.small$Condition)) == 2) {
-    
-    # Create label
-    label <- create.label(meta = meta.test.small, label = 'Condition', case = 'smallAD', control = 'CTR')
-    
-    # Create SIAMCAT test object
-    siamcat.test <- siamcat(feat = feat.test, meta = meta.test.small, label = label, case = 'smallAD')
-    siamcat.test <- make.predictions(siamcat, siamcat.holdout = siamcat.test)
-    siamcat.test <- evaluate.predictions(siamcat.test)
-    
-    # Store results
-    loso.eval.small.ad[[study]] <- siamcat.test
-    cat('LOSO model successfully tested on small AD for the study', study, '\n')
-    
-    # Save results
-    save(loso.eval.small.ad,  file = paste0(here('data','results','scv.loso','ad.loso.test/'),'Model.', study, '.smallAD.LOSO.test.Rdata'))
-    
-  } else {
-    cat('Skipping study', study, 'due to missing class in smallAD evaluation\n')
-  }
-}
-
-# Evaluate on advanced AD Subtype
-
-if ('AdvAD' %in% meta.test$Condition) {
-  
-  # Filter and check dataset
-  meta.test.adv <- meta.test %>% filter(Condition %in% c('AdvAD', 'CTR'))
-  if (length(unique(meta.test.adv$Condition)) == 2) {
-    
-    # Create label
-    label <- create.label(meta = meta.test.adv, label = 'Condition', case = 'AdvAD', control = 'CTR')
-    
-    # Create SIAMCAT test object
-    siamcat.test <- siamcat(feat = feat.test, meta = meta.test.adv, label = label, case = 'AdvAD')
-    siamcat.test <- make.predictions(siamcat, siamcat.holdout = siamcat.test)
-    siamcat.test <- evaluate.predictions(siamcat.test)
-    
-    # Store results
-    loso.eval.adv.ad[[study]] <- siamcat.test
-    cat('LOSO model successfully tested on AdvAD for the study', study, '\n')
-    
-    # Save results
-    save(loso.eval.adv.ad,  file = paste0(here('data','results','scv.loso','ad.loso.test/'),'Model.', study, '.advAD.LOSO.test.Rdata'))
-    
-  } else {
-    cat('Skipping study', study, 'due to missing class in advAD evaluation\n')
-  }
-}

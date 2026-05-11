@@ -2,15 +2,13 @@
 # Figure 2
 ######################
 
-library(here)
-
 source(here('src','utils.R'))
 params <- yaml::read_yaml(here("src", "parameters.yml"))
 plotting <- params$plotting
 
 # Load LMM tables for 16S and WGS
 load(here('data','results', 'lmm.table.crc.ctr.Rdata'))
-load(here('data','results', 'lmem.tables.eo.lo.Rdata'))
+load(here('data','results', 'lmm.tables.eo.lo.Rdata'))
 
 ######################
 # Figure 2a: Forest plot for EO/LO-CRC  vs EO/LO-CTR
@@ -44,7 +42,6 @@ lmm.table.eo <- lmm.table.eo %>%  #some dataset does not have either EO-CRC or E
 
 # Prepare Early Onset data
 lmm.table.eo <- lmm.table.eo %>%
-  filter(P.adj < 0.05) %>%
   dplyr::rename(LME = Effect.size) %>%
   arrange(LME) %>%
   rename_with(~ gsub("Effect.size_", "", .), starts_with("Effect.size")) %>%
@@ -53,7 +50,6 @@ lmm.table.eo <- lmm.table.eo %>%
 
 # Prepare Late Onset data
 lmm.table.lo <- lmm.table.lo %>%
-  filter(P.adj < 0.05) %>%
   dplyr::rename(LME = Effect.size) %>%
   arrange(LME) %>%
   rename_with(~ gsub("Effect.size_", "", .), starts_with("Effect.size")) %>%
@@ -65,7 +61,7 @@ datasets <- unique(c(all.meta.eo$Cohort, all.meta.lo$Cohort))
 
 merged <- bind_rows(lmm.table.eo, lmm.table.lo)
 
-# Order by absolute LME values
+# Order by absolute general effect size 
 merged_ordered <- merged %>%
   arrange(desc((LME))) %>%
   filter(Group %in% c("EO", "LO"))%>%
@@ -90,7 +86,6 @@ common_bacteria <- common_bacteria %>%
 common_bacteria <- common_bacteria %>%
   filter(!is.na(`model effect size`), !is.na(Bacteria))
 
-
 # Select top 10 positive and top 10 negative bacteria based on LME values
 top_positive_bacteria <- common_bacteria %>%
   filter(Dataset == "LME") %>%
@@ -108,11 +103,9 @@ top_negative_bacteria <- common_bacteria %>%
   slice(1:10) %>%
   pull(Bacteria)
 
-# Top_negative_bacteria
 # Combine the top positive and negative bacteria
 top_bacteria <- c( top_negative_bacteria,rev(top_positive_bacteria))
 
-# Filter the common_bacteria dataset to include only these bacteria
 common_bacteria_filtered <- common_bacteria %>%
   filter(Bacteria %in% top_bacteria) %>%
   mutate(Bacteria = factor(Bacteria, levels=top_bacteria))
@@ -206,7 +199,7 @@ corr <- cor(
 )
 
 # Format the label
-corr_label <- paste0("Pearson r = ", round(corr, 2))
+corr_label <- paste0("Pearson r2 = ", round(corr^2, 2))
 
 plot_comparison <- function(data, x_col, y_col, x_label, y_label) {
   # Prepare data with color coding based on criteria
@@ -245,11 +238,11 @@ plot_comparison <- function(data, x_col, y_col, x_label, y_label) {
       aes(label = label, fontface = font),
       color = "black",
       segment.color = "black",
-      segment.size = 0.3,         # Make label lines thinner
-      segment.ncp = 3,            # Number of control points (smooth lines)
-      max.overlaps = 20,         # Ensure all significant labels appear
-      min.segment.length = 0.2,   # Reduce the minimum length of connecting lines
-      nudge_x = 0.05,             # Slightly adjust text placement to prevent overlapping
+      segment.size = 0.3,         
+      segment.ncp = 3,           
+      max.overlaps = 20,         
+      min.segment.length = 0.2,   
+      nudge_x = 0.05,             
       nudge_y = 0.05,
       size = 3,
       seed = 123
@@ -338,9 +331,9 @@ colours <- c( "darkorange", "black" )
 
 eo_models_auc_plot <- plot_roc_siamcat_models(models, labels, colours, trained_on, alpha=0.7)
 
-
 ggsave(eo_models_auc_plot, file=here('figures','figure2','Figure2d.pdf'),width = 7, height = 7)
 
+######################
 # Figure 2e: Mean absolute SHAP value comparison of EO- and LO-CRC models
 
 # Load EO-CRC and LO-CRC models shap median values
@@ -436,14 +429,5 @@ scatter_plot <- ggplot(merged_data, aes(x = mean_abs_shap_eo, y = mean_abs_shap_
   guides(fill = guide_legend(override.aes = list(size = 3.5))) +
   coord_equal()
 
-print(scatter_plot)
-
-
 ggsave(scatter_plot,file=  here('figures','figure2','Figure2e.pdf'), height=6, width=6)
-
-
-
-
-
-
 

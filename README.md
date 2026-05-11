@@ -29,71 +29,74 @@ This repository contains the code, processed data, and figure scripts for the la
 ## Repository Structure
 
 ``` text
-crc-meta-ii
-├── data/
-│   └── results/
-│       ├── scv.loso/
-│       │   ├── ad.loso.test/
-│       │   ├── crc.loso.test/
-│       │   ├── crc.loso.train/
-│       │   └── crc.scv.sst/
-│       └── shap.analysis/
-│           ├── fold_info/
-│           ├── kernelshap_objects/
-│           └── models/
-├── figures/
-│   ├── figure1/
-│   ├── figure2/
-│   ├── figure3/
-│   ├── figure4/
-│   ├── figure5/
-│   ├── figure6/
-│   ├── extended.data.figure1/
-│   ├── extended.data.figure2/
-│   ├── extended.data.figure3/
-│   ├── extended.data.figure4/
-│   ├── extended.data.figure5/
-│   └── extended.data.figure7/
-├── models/
-│   ├── 01.Train.16s.wgs.rf.models.R
-│   ├── 02.Train.eo.lo.crc.rf.models.R
-│   ├── 03.Train.unified.crc.model.R
-│   ├── 04.run.Train.LOSO.rf.models.sh
-│   ├── 05.Train.SCV.SST.rf.models.R
-│   ├── 06.Train.ad.ctr.model.R
-│   ├── input.LOSO.rf.models.sh
-│   └── Train.LOSO.rf.models.R
-├── src/
-│   ├── analysis/
-│   │   ├── 01.PCoA.analysis.R
-│   │   ├── 02.lmm.16S.WGS.R
-│   │   ├── 03.lmm.EO.LO.R
-│   │   ├── 04a.prepare.data.and.models.for.shap.analysis.R
-│   │   ├── 04b.run_SHAP_test.sh
-│   │   ├── 04c.run_SHAP_test.slurm
-│   │   ├── 04d.get.shap.median.values.R
-│   │   ├── 05.alpha.diversity.and.sequencing.depth.R
-│   │   ├── 06.lmm.functional.profiles.R
-│   │   ├── input.LOSO.rf.models.sh
-│   │   ├── run_SHAP_test.R
-│   │   └── SHAP_job_list.sh
-│   ├── plotting/
-│   │   ├── Extended.data.figure1.R
-│   │   ├── Extended.data.figure2.R
-│   │   ├── Extended.data.figure3.R
-│   │   ├── Extended.data.figure4.R
-│   │   ├── Extended.data.figure5.R
-│   │   ├── Figure1.R
-│   │   ├── Figure2.R
-│   │   ├── Figure3.R
-│   │   ├── Figure4.R
-│   │   ├── Figure5.R
-│   │   └── Figure6.R
-│   ├── cancerness.utils.R
-│   ├── parameters.yml
-│   ├── requirements.R
-│   └── utils.R
-└── README.md
+.
+|-- data
+|   `-- results
+|       |-- scv.loso
+|       |   |-- ad.loso.test
+|       |   |-- crc.loso.test
+|       |   |-- crc.loso.train
+|       |   `-- crc.scv.sst
+|       `-- shap.analysis
+|           |-- fold_info
+|           |-- kernelshap_objects
+|           `-- models
+|-- figures
+|   |-- extended.data.figure1
+|   |-- extended.data.figure2
+|   |-- extended.data.figure3
+|   |-- extended.data.figure4
+|   |-- extended.data.figure5
+|   |-- extended.data.figure7
+|   |-- figure1
+|   |-- figure2
+|   |-- figure3
+|   |-- figure4
+|   |-- figure5
+|   `-- figure6
+|-- models
+|   |-- 01.Train.16s.wgs.rf.models.R
+|   |-- 02.Train.eo.lo.crc.rf.models.R
+|   |-- 02a.Test.eo.as.holdout.using.diff.cutoffs.R
+|   |-- 03.Train.unified.crc.model.R
+|   |-- 04.run.Train.LOSO.rf.models.sh
+|   |-- 05.Train.SCV.SST.rf.models.R
+|   |-- 06.Train.ad.ctr.model.R
+|   |-- 07.Test.ad.with.unified.crc.classifier.R
+|   |-- Train.LOSO.rf.models.R
+|   `-- input.LOSO.rf.models.sh
+|-- src
+|   |-- analysis
+|   |   |-- 01.PCoA.analysis.R
+|   |   |-- 02.lmm.16S.WGS.R
+|   |   |-- 03.lmm.EO.LO.R
+|   |   |-- 04a.prepare.data.and.models.for.shap.analysis.R
+|   |   |-- 04b.run_SHAP_test.sh
+|   |   |-- 04c.run_SHAP_test.slurm
+|   |   |-- 04d.get.shap.median.values.R
+|   |   |-- 05.alpha.diversity.and.sequencing.depth.R
+|   |   |-- 06.lmm.crc.tissue.R
+|   |   |-- 07.lmm.functional.profiles.R
+|   |   |-- 08.crc.scores.of.diet.data.R
+|   |   |-- SHAP_job_list.sh
+|   |   `-- run_SHAP_test.R
+|   |-- plotting
+|   |   |-- Extended.data.figure1.R
+|   |   |-- Extended.data.figure2.R
+|   |   |-- Extended.data.figure3.R
+|   |   |-- Extended.data.figure4.R
+|   |   |-- Figure1.R
+|   |   |-- Figure2.R
+|   |   |-- Figure3.R
+|   |   |-- Figure4.R
+|   |   |-- Figure5-Extended.data.figure5.R
+|   |   `-- Figure6.R
+|   |-- cancerness.utils.R
+|   |-- parameters.yml
+|   |-- requirements.R
+|   `-- utils.R
+|-- README.md
+`-- crc-meta-ii.Rproj
 ```
 
 > **Note:** The data are currently only accessible from within the EMBL intranet, but will be made publicly available on **Zenodo** or another suitable repository soon.

@@ -9,7 +9,6 @@ plotting <- params$plotting
 # Load LMM tables for 16S and WGS
 load(here('data','results', 'lmm.tables.16S.WGS.Rdata'))
 
-
 ######################
 # Figure 1b: Volcano plot for WGS
 
@@ -23,7 +22,6 @@ volcano_16S <- plot_volcano(
   feature_column_name ='Taxon',
   color_vector = c(group_case =  plotting$condition_colors$CRC, group_control = plotting$condition_colors$CTR, "n.s." = "white")) +
   xlab('16S enrichment effect size')
-
 
 ggsave(volcano_16S, file=here('figures','figure1','Figure1b.pdf'), height = 5, width = 5)
 
@@ -41,7 +39,6 @@ volcano_wgs <- plot_volcano(
 
 ggsave(volcano_wgs, file=here('figures','figure1','Figure1c.pdf'), height = 5, width = 5)
 
-
 # Combine LMM tables for scatter plot 
 lmm.table.all<- left_join(lmm.table.16S %>% select(Taxon, P.val, P.adj, Effect.size, pr.shift,pr.CRC,pr.CTR) ,
                            lmm.table.wgs %>% select(Taxon, P.val, P.adj, Effect.size, pr.shift,pr.CRC,pr.CTR), 
@@ -55,7 +52,7 @@ corr <- cor(
 )
 
 # Format the label
-corr_label <- paste0("Pearson r = ", round(corr, 2))
+corr_label <- paste0("Pearson r2 = ", round(corr^2, 2))
 
 # Compute jaccard index
 
@@ -107,8 +104,8 @@ ggsave(scatter, file=here('figures','figure1','Figure1d.pdf'), height=5, width=5
 # Figure 1e: AUROC for assay comparison
 load(here('data','results','Training.16s.wgs.rf.models.Rdata'))
 
-
 plot_roc_siamcat_models <- function(models, labels, colours, linetypes, trained_on = NULL, alpha = NULL) {
+  # Use the saved SIAMCAT evaluation objects to compare 16S and WGS transfer performance.
   
   determine_tpr_fpr_auc <- function(eval_data, auroc) {
     tpr_list <- list()
@@ -205,8 +202,8 @@ plot_roc_siamcat_models <- function(models, labels, colours, linetypes, trained_
   
   wrapped_labels <- sub(", ", ",\n", unlist(auc_list))
   
-  # Plot
-  p<-ggplot(all_roc_data, aes(x = FPR, y = TPR, color = model, linetype = model)) +
+  # Plotting the ROC curves
+  p <- ggplot(all_roc_data, aes(x = FPR, y = TPR, color = model, linetype = model)) +
     geom_line(size = 1.8, alpha = alpha) +
     scale_color_manual(values = setNames(colours, labels), labels = wrapped_labels, name = "Model") +  
     scale_linetype_manual(values = setNames(linetypes, labels), labels = wrapped_labels, name = "Model") +  
@@ -229,7 +226,7 @@ plot_roc_siamcat_models <- function(models, labels, colours, linetypes, trained_
   return(p)
 }
 
-
+# Plot ROC curves for the 4 models: 16S CV, 16S trained on WGS, WGS CV, WGS trained on 16S
 models <- list(models.rf.16S, siamcat.test.evaluated.16s.holdout.rf ,models.rf.wgs,  siamcat.test.evaluated.wgs.holdout.rf)
 labels <- c("Classifier cross validated on 16S",
             "Classifier trained on WGS and tested on 16S",
